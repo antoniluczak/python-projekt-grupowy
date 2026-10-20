@@ -1,12 +1,31 @@
-#tworzy dane jezeli ich nie ma,
-# # nadpisuje poprzednie hezeli jest
-def dodajDaneCSV(sciezka):
-
-#zczytuje dane ze wszystkich elementow tablicy
-def zczytajCSV(sciezka[]):
-
 import csv 
+import random
+import os
 
 def dodajDaneCSV(sciezka):
-    with open(sciezka, "w", encoding="utf-8") as plik:
+    dane=["Model","Wynik","Czas"]
+    y=os.path.join(sciezka,"Dane.csv")
+    with open(y, "w", encoding="utf-8",newline='') as plik:
+        obiekt=csv.writer(plik,delimiter=";")
+        obiekt.writerow(dane)
+        obiekt.writerow(_losuj())
+
+def _losuj():
+    x=random.choice(["A","B","C"])
+    y=random.randint(0,1000)
+    z=random.randint(0,1000)
+    return [x,y,z]
+
+def zczytajCSV(sciezka):
+    j=0
+    for i in sciezka:
+        y=os.path.join(i,"Dane.csv")
+        if os.path.isfile(y):
+            with open(y,"r",encoding="utf-8") as plik:
+                obiekt = csv.reader(plik, delimiter=';')
+                pl=next(obiekt)
+                pl=next(obiekt)
+                j +=int(pl[2])
+    return j
+
         
