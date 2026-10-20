@@ -2,6 +2,9 @@ import csv
 import random
 import os
 
+#przyjmuje sciezke bez nazwy pliku,
+#tworzy plik jezeli go nie ma, zapisuje od nowa jezeli jest
+
 def dodajDaneCSV(sciezka):
     dane=["Model","Wynik","Czas"]
     y=os.path.join(sciezka,"Dane.csv")
@@ -16,6 +19,11 @@ def _losuj():
     z=random.randint(0,1000)
     return [x,y,z]
 
+#przyjmuje tablice sciezek
+#dla kazdej sciezki sprawdza,czy w niej istnieje plkik csv
+#jezeli tak, to dodaje czas z niego
+#jezeli nie, to nic nie dodaje
+#zwraca wynik (int)
 def zczytajCSV(sciezka):
     j=0
     for i in sciezka:
