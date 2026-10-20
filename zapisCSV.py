@@ -4,3 +4,9 @@ def dodajDaneCSV(sciezka):
 
 #zczytuje dane ze wszystkich elementow tablicy
 def zczytajCSV(sciezka[]):
+
+import csv 
+
+def dodajDaneCSV(sciezka):
+    with open(sciezka, "w", encoding="utf-8") as plik:
+        
