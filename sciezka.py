@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-def generuj_sciezke(miesiac: str, dzien: str, pora: str = "rano") -> tuple[Path, bool]:
+def generuj_sciezke(miesiac: str, dzien: str, pora: str = "rano") -> Path:
     sciezka = Path(miesiac, dzien, pora)
 
     # Jeśli katalog już istnieje, zwracamy samą sciezke
