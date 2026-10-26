@@ -45,14 +45,33 @@ def _generate_args() -> argparse.Namespace:
 
     return args
 
-def parse_input_and_run() -> None:
-    """Parse user input and run the program on it.
-    
-    Raises:
-        ValueError: If the input was incorrect.
-        OSError: If directory reading/generation failed.
-    """
-    # Used to parse intervals and validate input
+def _parse_months(raw_months: list[str]) -> list[str]:
+    months_list = [
+        'styczeń',
+        'luty',
+        'marzec',
+        'kwiecień',
+        'maj',
+        'czerwiec',
+        'lipiec',
+        'sierpień',
+        'wrzesień',
+        'październik',
+        'listopad',
+        'grudzień'
+    ]
+    if len(raw_months) != len(set(raw_months)):
+        raise ValueError('Błąd: powtarzające się miesiące')
+    months = []
+    for month in raw_months:
+        if month not in months_list:
+            raise ValueError('Błędny miesiąc: ' + month)
+        
+        months.append(month.capitalize())
+
+    return months
+
+def _parse_days(raw_days: list[str]) -> list[str]:
     days_list = [
         'pn', 
         'wt', 
@@ -71,45 +90,10 @@ def parse_input_and_run() -> None:
         'Sobota',
         'Niedziela'
     ]
-    months_list = [
-        'styczeń',
-        'luty',
-        'marzec',
-        'kwiecień',
-        'maj',
-        'czerwiec',
-        'lipiec',
-        'sierpień',
-        'wrzesień',
-        'październik',
-        'listopad',
-        'grudzień'
-    ]
-    times_list = ['r', 'w']
 
-    args = _generate_args()
-
-    input_string = input()
-    groups = re.findall(r'\[([^\]]*)\]', input_string)
-    if len(groups) != 3:
-        raise ValueError('Błędna liczba argumentów')
-
-    # Parse months
-    months_before_upper = groups[0].replace(" ", "").split(',')
-    if len(months_before_upper) != len(set(months_before_upper)):
-        raise ValueError('Błąd: powtarzające się miesiące')
-    months = []
-    for month in months_before_upper:
-        if month not in months_list:
-            raise ValueError('Błędny miesiąc: ' + month)
-        
-        months.append(month.capitalize())
-
-    # Parse days
-    days_before_split = groups[1].replace(" ", "").split(',')
     days = []
-    for i in range(len(days_before_split)):
-        days_helper = days_before_split[i].split('-')
+    for i in range(len(raw_days)):
+        days_helper = raw_days[i].split('-')
         match len(days_helper):
             case 1:
                 if days_helper[0] not in days_list:
@@ -131,19 +115,48 @@ def parse_input_and_run() -> None:
             case _:
                 raise ValueError("Błędny zakres dni tygodnia")
 
-    if len(months) != len(days):
-        raise ValueError("Błąd: liczba miesięcy jest różna od liczby dni tygodnia")
+    return days
 
-    # Parse time                
-    time_short = groups[2].replace(" ", "").split(',')
+def _parse_times(raw_times: list[str]) -> list[str]:
+    times_list = ['r', 'w']
+
     times = []
-    for time in time_short:
+    for time in raw_times:
         if time not in times_list:
             raise ValueError("Błędna pora dnia: " + time)
         if time == 'r':
             times.append('rano')
         if time == 'w':
             times.append('wieczorem')
+
+    return times
+
+def parse_input_and_run() -> None:
+    """Parse user input and run the program on it.
+    
+    Raises:
+        ValueError: If the input was incorrect.
+        OSError: If directory reading/generation failed.
+    """
+    
+    args = _generate_args()
+
+    input_string = input()
+    groups = re.findall(r'\[([^\]]*)\]', input_string)
+    if len(groups) != 3:
+        raise ValueError('Błędna liczba argumentów')
+
+    raw_months = groups[0].replace(" ", "").split(',')
+    months = _parse_months(raw_months)
+
+    raw_days = groups[1].replace(" ", "").split(',')
+    days = _parse_days(raw_days)
+    
+    if len(months) != len(days):
+        raise ValueError("Błąd: liczba miesięcy jest różna od liczby dni tygodnia")
+               
+    raw_times = groups[2].replace(" ", "").split(',')
+    times = _parse_times(raw_times)
 
     # Generate a list of directories from the parsed data
     directories = []
