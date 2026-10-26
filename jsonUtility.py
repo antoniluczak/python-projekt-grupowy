@@ -28,7 +28,8 @@ def _read_from_existing_file(file):
 # does not handle exceptions related to the system failing to read the file
 # does not handle exception of invalid json, try except is a must
 # returns time if model is equal to A, 0 otherwise
-def przetworz_istniejacy_plik(file):
+def przetworz_istniejacy_plik(folder):
+  file = os.path.join(folder, 'dane.json')
   dataArr = _read_from_existing_file(file)
   if len(dataArr) != 2:
     raise ValueError(f'W jsonie jest {len(dataArr)} rekordow, zamiast oczekiwanych dwoch')

@@ -2,6 +2,48 @@ import argparse
 import re
 import sciezka
 import zapisCSV
+import jsonUtility
+from pathlib import Path
+
+# Sets up the parser and generates argument values
+def _generate_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="""
+        Program tworzący oraz odczytujący pliki na podstawie danych wejściowych.
+
+        Na wejściu powinny się pojawić:
+        - Lista miesięcy
+        - Lista zakresów dni tygodnia (tyle samo argumentów co w liście miesięcy)
+        - Lista pór dnia (rano lub wieczór), domyślnie rano
+        
+        Przykład:
+        [styczeń, luty], [pn-wt, pt], [r,w]
+
+        Styczeń/poniedziałek/rano
+        Styczeń/wtorek/wieczorem
+        Luty/piątek/rano (bo domyślnie)
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('-o', action='store_true',
+                        help='Sprawia, że program czyta pliki podane na wejściu, '
+                        "sumuje wartość 'Czas' dla wszystkich plików, "
+                        "w których 'Model' ma wartość 'A'")
+    parser.add_argument('-t', action='store_true',
+                        help='Sprawia, że program tworzy foldery '
+                        'oraz pliki z danymi na podstawie wejścia.')
+    parser.add_argument('-c', action='store_true',
+                        help='Sprawia, że program pracuje z plikami CSV.')
+    parser.add_argument('-j', action='store_true',
+                        help='Sprawia, że program pracuje z plikami JSON.')
+
+    args =  parser.parse_args()
+    if args.t and args.o:
+        raise ValueError('Błąd: flagi -t, -o nie mogą być jednocześnie zapalone')
+    if args.c and args.j:
+        raise ValueError('Błąd: flagi -c, -j nie mogą być jednocześnie zapalone')
+
+    return args
 
 def parse_input_and_run() -> None:
     """Parse user input and run the program on it.
@@ -45,17 +87,7 @@ def parse_input_and_run() -> None:
     ]
     times_list = ['r', 'w']
 
-    parser = argparse.ArgumentParser(description = '')
-    parser.add_argument('-o', action='store_true')
-    parser.add_argument('-t', action='store_true')
-    parser.add_argument('-c', action='store_true')
-    parser.add_argument('-j', action='store_true')
-
-    args = parser.parse_args()
-    if args.t and args.o:
-        raise ValueError('Błąd: flagi -t, -o nie mogą być jednocześnie zapalone')
-    if args.c and args.j:
-        raise ValueError('Błąd: flagi -c, -j nie mogą być jednocześnie zapalone')
+    args = _generate_args()
 
     input_string = input()
     groups = re.findall(r'\[([^\]]*)\]', input_string)
@@ -71,7 +103,7 @@ def parse_input_and_run() -> None:
         if month not in months_list:
             raise ValueError('Błędny miesiąc: ' + month)
         
-        months.append(month.upper())
+        months.append(month.capitalize())
 
     # Parse days
     days_before_split = groups[1].replace(" ", "").split(',')
@@ -119,25 +151,33 @@ def parse_input_and_run() -> None:
     for i in range(len(months)):
         for j in range(len(days[i])):
             if times_index >= len(times):
-                directories.append(sciezka.generuj_sciezke(months[i], days[i][j]))
+                directories.append(Path(months[i], days[i][j], "rano"))
+                if args.t:
+                    sciezka.generuj_sciezke(months[i], days[i][j])
             else:
-                directories.append(sciezka.generuj_sciezke(months[i], days[i][j], times[times_index]))
+                directories.append(Path(months[i], days[i][j], times[times_index]))
+                if args.t:
+                    sciezka.generuj_sciezke(months[i], days[i][j], times[times_index]) 
                 times_index += 1
 
     if args.c:
         if args.t:
             for directory in directories:
                 zapisCSV.dodajDaneCSV(directory)
-        else:
+        if args.o:
             print('Suma wartości z kolumny "Czas": ' + str(zapisCSV.zczytajCSV(directories)))
-        
-    # TODO: Handle JSON
-    # No implementation in zapisJSON.py
+    if args.j:
+        if args.t:
+            for directory in directories:
+                jsonUtility.stworz_badz_nadpisz_jsona(directory)
+        if args.o:
+            sum = 0
+            for directory in directories:
+                sum += jsonUtility.przetworz_istniejacy_plik(directory)
+            print('Suma wartości z kolumny "Czas": ' + str(sum))
 
 if __name__ == "__main__":
     try:
         parse_input_and_run()
-    except ValueError as e:
-        print(e)
-    except OSError as e:
+    except Exception as e:
         print(e)
