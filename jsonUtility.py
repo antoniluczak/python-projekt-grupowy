@@ -31,7 +31,7 @@ def _read_from_existing_file(file):
 def przetworz_istniejacy_plik(folder):
   file = os.path.join(folder, 'dane.json')
   dataArr = _read_from_existing_file(file)
-  if len(dataArr) != 2:
+  if len(dataArr) != 1:
     raise ValueError(f'W jsonie jest {len(dataArr)} rekordow, zamiast oczekiwanych dwoch')
   suma = 0
 

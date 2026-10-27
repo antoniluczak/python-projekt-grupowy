@@ -43,6 +43,10 @@ def _generate_args() -> argparse.Namespace:
         raise ValueError('Błąd: flagi -t, -o nie mogą być jednocześnie zapalone')
     if args.c and args.j:
         raise ValueError('Błąd: flagi -c, -j nie mogą być jednocześnie zapalone')
+    if not args.t and not args.o:
+        raise ValueError('Błąd: brak flagi -o oraz -t')
+    if not args.c and not args.j:
+        raise ValueError('Błąd: brak flagi -c oraz -j')
 
     return args
 
