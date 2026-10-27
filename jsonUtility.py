@@ -50,18 +50,13 @@ def przetworz_istniejacy_plik(folder):
 
 
 def stworz_badz_nadpisz_jsona(folder):
-  pierwszy_rekord = {
-    'Model': 'A',
-    'Wynik': 17,
-    'Czas': '465s'
-  }
   opcje = ['A', 'B', 'C']
-  drugi_rekord = {
+  rekord = {
     'Model': opcje[random.randint(0, 2)],
     'Wynik': random.randint(0, 1000),
     'Czas': str(random.randint(0, 1000))+'s'
   }
-  data = [pierwszy_rekord, drugi_rekord]
+  data = [rekord]
   dataStr = json.dumps(data, indent=10) # 10 bo to moja biblioteka
   _overwrite_or_create_in_existing_folder('dane.json', folder, dataStr)
 

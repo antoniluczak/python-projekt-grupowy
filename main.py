@@ -28,7 +28,8 @@ def _generate_args() -> argparse.Namespace:
     parser.add_argument('-o', action='store_true',
                         help='Sprawia, że program czyta pliki podane na wejściu, '
                         "sumuje wartość 'Czas' dla wszystkich plików, "
-                        "w których 'Model' ma wartość 'A'")
+                        "w których 'Model' ma wartość 'A'. W przypadku braku"
+                        "istnienia jednego z plików zwraca błąd.")
     parser.add_argument('-t', action='store_true',
                         help='Sprawia, że program tworzy foldery '
                         'oraz pliki z danymi na podstawie wejścia.')
