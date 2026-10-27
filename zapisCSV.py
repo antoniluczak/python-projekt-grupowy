@@ -16,7 +16,7 @@ def dodajDaneCSV(sciezka):
 def _losuj():
     x = random.choice(["A", "B", "C"])
     y = random.randint(0, 1000)
-    z =string ( random.randint(0, 1000))+'s'
+    z =str ( random.randint(0, 1000))+'s'
     
     return [x,y,z]
 
